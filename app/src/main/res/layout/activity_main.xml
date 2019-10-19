@@ -9,6 +9,7 @@
     tools:context=".MainActivity">
 
     <FrameLayout
+        android:id="@+id/vContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#000000"
@@ -34,5 +35,9 @@
         </FrameLayout>
 
     </FrameLayout>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>
