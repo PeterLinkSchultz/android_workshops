@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
@@ -30,6 +32,15 @@ class LoginActivity : AppCompatActivity() {
                 else -> setLoginState()
             }
         }
+        etLogin.setText(getLastLoginInput())
+        etLogin.addTextChangedListener(object: TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {
+                val value = p0?.toString() ?: ""
+                saveLoginInput(login = value)
+            }
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+        })
     }
 
     private fun setLoginState() {
@@ -50,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
             register(
                 login = etLogin.text.toString(),
                 password = etPassword.text.toString(),
-                repeatedPassword = etRepeatPassword.toString()
+                repeatedPassword = etRepeatPassword.text.toString()
             )
         }
     }
@@ -89,6 +100,16 @@ class LoginActivity : AppCompatActivity() {
         showSnack("Registered")
     }
 
+    private fun saveLoginInput(login: String) {
+        prefs.edit().putString(LAST_LOGIN_INPUT_KEY, login).apply()
+    }
+
+    private fun getLastLoginInput(): String =
+        getLogin().takeIf { it.isNotBlank() }
+            ?: prefs.getString(LAST_LOGIN_INPUT_KEY, "") ?: ""
+
+    private fun getLogin(): String = prefs.getString(LOGIN_KEY, "") ?: ""
+
     private fun showSnack(text: String) {
         Snackbar.make(vRoot, text, Snackbar.LENGTH_SHORT).show()
     }
@@ -102,5 +123,6 @@ class LoginActivity : AppCompatActivity() {
     companion object {
         private const val LOGIN_KEY = "login"
         private const val PASSWORD_KEY = "password"
+        private const val LAST_LOGIN_INPUT_KEY = "LAST_LOGIN_INPUT"
     }
 }
