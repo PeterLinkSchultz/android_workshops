@@ -3,13 +3,13 @@ package com.danser.workshop4_login
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_login.*
+import java.util.*
 
 class LoginActivity : AppCompatActivity() {
 
@@ -67,13 +67,13 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun login(login: String, password: String) {
-        val correctLogin = prefs.getString(LOGIN_KEY, "")
-        val correctPassword = prefs.getString(PASSWORD_KEY, "")
-        if (login.isBlank()) {
+        val correctPassword = prefs.getString(login.toLowerCase(Locale.ROOT), "")
+
+        if (login.isBlank() || correctPassword.isNullOrBlank()) {
             showSnack("Couldn't login with empty login")
             return
         }
-        if (login != correctLogin || password != correctPassword) {
+        if (password != correctPassword) {
             showSnack("Login or password are incorrect")
             return
         }
@@ -94,8 +94,7 @@ class LoginActivity : AppCompatActivity() {
             showSnack("Couldn't register, passwords should be the same")
             return
         }
-        prefs.edit().putString(LOGIN_KEY, login).apply()
-        prefs.edit().putString(PASSWORD_KEY, password).apply()
+        prefs.edit().putString(login.toLowerCase(Locale.ROOT), password).apply()
         startMainScreenAndClose()
         showSnack("Registered")
     }
@@ -104,11 +103,7 @@ class LoginActivity : AppCompatActivity() {
         prefs.edit().putString(LAST_LOGIN_INPUT_KEY, login).apply()
     }
 
-    private fun getLastLoginInput(): String =
-        getLogin().takeIf { it.isNotBlank() }
-            ?: prefs.getString(LAST_LOGIN_INPUT_KEY, "") ?: ""
-
-    private fun getLogin(): String = prefs.getString(LOGIN_KEY, "") ?: ""
+    private fun getLastLoginInput(): String? = prefs.getString(LAST_LOGIN_INPUT_KEY, "")
 
     private fun showSnack(text: String) {
         Snackbar.make(vRoot, text, Snackbar.LENGTH_SHORT).show()
@@ -121,8 +116,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val LOGIN_KEY = "login"
-        private const val PASSWORD_KEY = "password"
         private const val LAST_LOGIN_INPUT_KEY = "LAST_LOGIN_INPUT"
     }
 }
